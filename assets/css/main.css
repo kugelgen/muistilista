@@ -1,27 +1,66 @@
 
 body {
-	background: #fdfdfd;
-	font-family: Arial, sans-serif;
+	font-family: "Arial", sans-serif;
+	margin-left: 3em;
+	margin-right: 7%;
+	background-color: #CC9999;  
+	padding: 4em;
+	text-align: justify;;
 }
+
+a:link {color:#660033;}
+a:visited {color:#660033;}
 
 #atomik-wrapper {
 	margin: 50px auto auto;
-	text-align: right;
-	width: 50%;
+	width: 880px;
 }
 
-	#atomik {
-		background: #f8ffea;
-		border: 3px solid #aad944;
-		margin-bottom: 10px;
-		padding: 10px;
-		text-align: left;
-	}
+#atomik-wrapper-small {
+	margin: 50px auto auto;
+	text-align: right;
+	width: 450px;
+}
+
+#atomik {
+	background: #f8ffea;
+	border: 3px solid #660033;
+	margin-bottom: 10px;
+	padding: 10px;
+	text-align: center;
+}
 	
-		#atomik h1 {
-			color: #5f5f5f;
-		}
-		
-	#atomik-wrapper img {
-		border: 0;
-	}
+#atomik h1 {
+	color: #660033;
+}
+
+#atomik h2 {
+	color: #660033;
+}
+
+#atomik-wrapper img {
+	border: 0;
+
+}
+
+#atomik table {
+	border: none;
+	text-align: left;
+}
+
+#atomik td {
+	border: 1px solid black;
+}	
+
+#atomik td.noborder {
+	border: none;
+} 
+	
+#headnav {
+	font-style: italic;
+	margin-top: 10px;
+	text-align: center;
+	color: #660033;
+}
+
+

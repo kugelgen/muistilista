@@ -12,6 +12,13 @@
 		<script type="text/javascript" src="<?php echo Atomik::appAsset($script) ?>"></script>
 		<?php endforeach; ?>
 	</head>
+	<div id="headnav">
+		<a href="<?= Atomik::url('etusivu') ?>">Uusi askare</a> * 
+		<a href="<?= Atomik::url('uusi_askare') ?>">Uusi askare</a> * 
+		<a href="<?= Atomik::url('uusi_luokka') ?>">Uusi luokka</a> * 
+		<a href="<?= Atomik::url('luokat') ?>">Muokkaa luokkia</a> *
+		<a href="<?= Atomik::url('index') ?>">Kirjaudu ulos</a>
+	</div>
 	<body>
 		<ul id="messages">
 			<?php foreach (A('flash:all') as $label => $messages): ?>
