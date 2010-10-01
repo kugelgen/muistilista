@@ -4,11 +4,11 @@ create table Askare (
 	Kirjaushetki	timestamp(0) not null,
 	Tärkeysaste	integer,
 	DL		timestamp(0),
-	Luokka	integer references Luokka (LuokkaID),
+	Luokka	integer references Luokka (LuokkaID)
 );
 
 create table Luokka (
 	LuokkaID	serial not null primary key,
 	Nimi		varchar(10) not null,
-	Ylaluokka	integer references Luokka (LuokkaID),
+	Ylaluokka	integer references Luokka (LuokkaID)
 );
