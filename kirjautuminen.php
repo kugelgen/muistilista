@@ -8,7 +8,7 @@
 	
 		$_SESSION['kirjauduttu'] = '0';
 		
-		$salasana = $_POST["salasana"];
+		$salasana = filter_input(INPUT_POST, "salasana", FILTER_SANITIZE_SPECIAL_CHARS);
 		if($salasana == 'testisala') {
 			$_SESSION['kirjauduttu'] = '1';
 			header('Location: etusivu.php');
@@ -17,6 +17,7 @@
 
 		else {
 			header('Location: index.php');
+			$_SESSION['kirjauduttu'] = '2';
 			exit;
 		}
 

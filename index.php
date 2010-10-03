@@ -1,6 +1,5 @@
 <?php 
 	session_start();
-	$_SESSION['kirjauduttu'] = '0';
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -20,9 +19,16 @@
 		<link rel="stylesheet" type="text/css" href="main.css" />
 		<h1>Kirjautuminen</h1>
 		<p>
-			Tervetuloa Muistilista-sovellukseen.
+		<?php 
+		if($_SESSION['kirjauduttu'] == '2') {
+			echo "Annoit väärän salasanan.";
+		} else {
+			echo "Tervetuloa Muistilista-sovellukseen.";
+		}
+		?>
 		</p>
 		<p>
+
 		<form action="kirjautuminen.php" method="post">
 		<p>Salasana: <input type="password" name="salasana" value="" size="15" /> <input type=submit value="Kirjaudu"/></p>
 		</form>

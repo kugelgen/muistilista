@@ -28,7 +28,7 @@ else {
   <a href="etusivu.php">Etusivu</a> * 
   <a href="uusi_askare.php">Uusi askare</a> *  
   <a href="uusi_luokka.php">Uusi luokka</a> * 
-  <a href="index.php">Kirjaudu ulos</a>
+  <a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 
 <div class="pienikehys">

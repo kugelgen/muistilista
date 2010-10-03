@@ -12,6 +12,25 @@ else {
 	$yhteys = new PDO("pgsql:host=localhost;dbname=kugelgen",
 		              "kugelgen", "d3626dddc9b387bc");	
 	$yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	
+	if (isset($_POST['submit'])) {
+
+			$nimi = filter_input(INPUT_POST, "luokka", FILTER_SANITIZE_SPECIAL_CHARS);
+			
+			$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE nimi=?");
+			$tarkista->execute(array($nimi));
+			$onko_olemassa = $tarkista->fetchObject();
+			
+			if ($onko_olemassa == FALSE) {
+			
+				$yhteys->beginTransaction();
+				$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
+				$lisaaluokka->execute(array($nimi));
+				$yhteys->commit();
+				header('Location: luokat.php');
+			}
+			
+		}
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -28,31 +47,41 @@ else {
 	<a href="etusivu.php">Etusivu</a> *
 	<a href="uusi_askare.php">Uusi askare</a> *  
 	<a href="luokat.php">Muokkaa luokkia</a> *
-	<a href="index.php">Kirjaudu ulos</a>
+	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 
 <div class="pienikehys">
 	<div class="ruutu">
 	
 	<h2>Luokka</h2>	
-	
 	<p>
 	<table align="center">
 	<col width="130px"/>
 	<col width="170px"/>
 		<tr>
 		<td class="noborder">Nimi</td>
-		<td class="noborder"><form action="jotain" method="post">
-		<input type="text" name="nimi" value="" size="15" maxlength="10" />
+		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post">
+		<input type="text" name="luokka" value="" size="15" maxlength="10" />
 		</td>
 		</tr>
-		
+		<?php 
+			$yhteys->beginTransaction();
+			$hae = $yhteys->prepare("SELECT nimi FROM luokka");
+			$hae->execute();
+			$kaikki = $hae->fetchAll();
+		?>
 		<tr>
 		<td class="noborder">Yläluokka</td>
 		<td class="noborder">
 		<select name="luokat">
 		<option>Valitse</option>
-		<option>joku luokka</option>
+		<?php
+			for ($i=0; $i<count($kaikki); $i++) { 
+				$valinta = $kaikki[$i]["nimi"];
+		?>
+		<option><?php echo $valinta ?></option>
+		<?php } ?>
+		
 		</select>
 		</td>
 		</tr>
@@ -61,8 +90,14 @@ else {
 	</p>
 	<p></p>
 	<p>
-		<p align=right><input type=submit value="Tallenna"/></p>
+		<p align=right><input type=submit name=submit value="Tallenna"/></p>
 		</form>
+		
+		<?php
+		if ($onko_olemassa != FALSE) {
+			echo "Luokka $nimi löytyy jo.";
+		}
+		?>
 	</p>
 	<p></p>
 
