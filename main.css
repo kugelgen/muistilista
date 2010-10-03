@@ -11,18 +11,18 @@ body {
 a:link {color:#660033;}
 a:visited {color:#660033;}
 
-#atomik-wrapper {
+.kehys {
 	margin: 50px auto auto;
 	width: 880px;
 }
 
-#atomik-wrapper-small {
+.pienikehys {
 	margin: 50px auto auto;
 	text-align: right;
 	width: 450px;
 }
 
-#atomik {
+.ruutu {
 	background: #f8ffea;
 	border: 3px solid #660033;
 	margin-bottom: 10px;
@@ -30,33 +30,29 @@ a:visited {color:#660033;}
 	text-align: center;
 }
 	
-#atomik h1 {
+h1, h2, h3 {
 	color: #660033;
 }
 
-#atomik h2 {
-	color: #660033;
-}
-
-#atomik-wrapper img {
+img {
 	border: 0;
 
 }
 
-#atomik table {
+table {
 	border: none;
 	text-align: left;
 }
 
-#atomik td {
+td {
 	border: 1px solid black;
 }	
 
-#atomik td.noborder {
+td.noborder {
 	border: none;
 } 
 	
-#headnav {
+.headnav {
 	font-style: italic;
 	margin-top: 10px;
 	text-align: center;
