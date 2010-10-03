@@ -16,6 +16,7 @@ else {
 	if (isset($_POST['submit'])) {
 
 			$nimi = filter_input(INPUT_POST, "luokka", FILTER_SANITIZE_SPECIAL_CHARS);
+			$ylaluokka = $_POST["luokat"];
 			
 			$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE nimi=?");
 			$tarkista->execute(array($nimi));
@@ -24,8 +25,14 @@ else {
 			if ($onko_olemassa == FALSE) {
 			
 				$yhteys->beginTransaction();
-				$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
-				$lisaaluokka->execute(array($nimi));
+				if ($ylaluokka == 0) {
+					$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
+					$lisaaluokka->execute(array($nimi));
+				}
+				else {
+					$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi, ylaluokka) VALUES (?, ?)");
+					$lisaaluokka->execute(array($nimi, $ylaluokka));
+				}
 				$yhteys->commit();
 				header('Location: luokat.php');
 			}
@@ -66,7 +73,7 @@ else {
 		</tr>
 		<?php 
 			$yhteys->beginTransaction();
-			$hae = $yhteys->prepare("SELECT nimi FROM luokka");
+			$hae = $yhteys->prepare("SELECT nimi FROM luokka ORDER BY nimi");
 			$hae->execute();
 			$kaikki = $hae->fetchAll();
 		?>
@@ -74,12 +81,13 @@ else {
 		<td class="noborder">Yläluokka</td>
 		<td class="noborder">
 		<select name="luokat">
-		<option>Valitse</option>
+		<option value=0>Valitse</option>
 		<?php
 			for ($i=0; $i<count($kaikki); $i++) { 
 				$valinta = $kaikki[$i]["nimi"];
+				$valintaID = $kaikki[$i]["luokkaID"];
 		?>
-		<option><?php echo $valinta ?></option>
+		<option value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
 		<?php } ?>
 		
 		</select>
