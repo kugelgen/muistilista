@@ -51,7 +51,7 @@ else {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi" lang="fi">
 
 <head>
-	<title>Uusi askare</title>
+	<title>Askare</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" type="text/css" href="main.css" />
 </head>

@@ -45,7 +45,7 @@ else {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi" lang="fi">
 
 <head>
-	<title>Uusi luokka</title>
+	<title>Luokka</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" type="text/css" href="main.css" />
 </head>
@@ -73,7 +73,7 @@ else {
 		</tr>
 		<?php 
 			$yhteys->beginTransaction();
-			$hae = $yhteys->prepare("SELECT nimi FROM luokka ORDER BY nimi");
+			$hae = $yhteys->prepare("SELECT nimi, luokkaid FROM luokka ORDER BY nimi");
 			$hae->execute();
 			$kaikki = $hae->fetchAll();
 		?>
@@ -85,7 +85,7 @@ else {
 		<?php
 			for ($i=0; $i<count($kaikki); $i++) { 
 				$valinta = $kaikki[$i]["nimi"];
-				$valintaID = $kaikki[$i]["luokkaID"];
+				$valintaID = $kaikki[$i]["luokkaid"];
 		?>
 		<option value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
 		<?php } ?>

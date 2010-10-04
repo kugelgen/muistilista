@@ -45,16 +45,31 @@ else {
 		<th class="noborder">Luokka</th>
 		<th class="noborder">Yläluokka</th>
 		</tr>
+		
+		<?php 
+			$hae = $yhteys->prepare("SELECT luokkaid, nimi, ylaluokka FROM luokka ORDER BY nimi");
+			$hae->execute();
+			$kaikki = $hae->fetchAll();
+			
+			$yl_tiedot = $yhteys->prepare("SELECT B.nimi FROM luokka A, luokka B WHERE A.ylaluokka=B.luokkaID AND A.ylaluokka=?");
+		?>
+		
 		<tr>
-		<td>eka luokka</td>
-		<td></td>
-		<td class="noborder"><form><input type=image src="muokkaa.jpg" alt="Muokkaa"/>  <input type=image src="poista.jpg" alt="Poista"></form></td>
+		<?php
+		for ($i=0; $i<count($kaikki); $i++) {
+			$luokanID = $kaikki[$i]["luokkaid"];
+			$luokannimi = $kaikki[$i]["nimi"];
+			$ylaluokkaID = $kaikki[$i]["ylaluokka"];
+			
+			$yl_tiedot->execute(array($ylaluokkaID));
+			$ylaluokannimi = $yl_tiedot->fetchObject()->nimi;
+		?>
+		<td><?php echo $luokannimi ?></td>
+		<td><?php echo $ylaluokannimi ?></td>
+		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post">
+		<input type=image src="muokkaa.jpg" alt="Muokkaa" name="muokkaa"/>  <input type=image src="poista.jpg" alt="Poista" name="poista"></form></td>
 		</tr>
-		<tr>
-		<td>toka luokka</td>
-		<td>tokan yläluokka</td>
-		<td class="noborder"><form><input type=image src="muokkaa.jpg" alt="Muokkaa"/>  <input type=image src="poista.jpg" alt="Poista"></form></td>
-		</tr>
+		<?php } ?>
 	</table>
 	</p>
 	<p></p>
