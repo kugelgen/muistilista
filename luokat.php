@@ -12,6 +12,16 @@ else {
 	$yhteys = new PDO("pgsql:host=localhost;dbname=kugelgen",
 		              "kugelgen", "d3626dddc9b387bc");	
 	$yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	
+		if (isset($_POST['poista'])) {
+			$luokka = $_POST['poista'];
+			$poisto = $yhteys->prepare("DELETE FROM luokka WHERE luokkaid=?");
+			$poisto->execute(array($luokka));
+		} else if (isset($_POST['muokkaa'])) {
+			$_SESSION['l_id'] = $_POST['muokkaa'];
+			header('Location: uusi_luokka.php');
+		}
+	
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -66,8 +76,8 @@ else {
 		?>
 		<td><?php echo $luokannimi ?></td>
 		<td><?php echo $ylaluokannimi ?></td>
-		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post">
-		<input type=image src="muokkaa.jpg" alt="Muokkaa" name="muokkaa"/>  <input type=image src="poista.jpg" alt="Poista" name="poista"></form></td>
+		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post" >
+		<input type=image src="muokkaa.jpg" alt="muokkaa" name="muokkaa" value="<?php echo $luokanID ?>">  <input type=image src="poista.jpg" alt="poista" name="poista" value="<?php echo $luokanID ?>" ></form></td>
 		</tr>
 		<?php } ?>
 	</table>
