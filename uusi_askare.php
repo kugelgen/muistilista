@@ -31,12 +31,16 @@ else {
 					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki) VALUES (?, ?)");
 					$lisaa_askare->execute(array($nimi, $pvm));
 				}
-				else if ($luokka != 0) {
+				else if ($tarkeys == 0) {
 					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka) VALUES (?, ?, ?)");
 					$lisaa_askare->execute(array($nimi, $pvm, $luokka));
 				}
+				else if ($luokka == 0) {
+					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, tarkeysaste) VALUES (?, ?, ?)");
+					$lisaa_askare->execute(array($nimi, $pvm, $tarkeys));
+				}
 				else {
-					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tärkeysaste) VALUES (?, ?, ?, ?)");
+					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tarkeysaste) VALUES (?, ?, ?, ?)");
 					$lisaa_askare->execute(array($nimi, $pvm, $luokka, $tarkeys));
 				}
 				$yhteys->commit();
@@ -82,7 +86,7 @@ else {
 		
 		<?php 
 			$yhteys->beginTransaction();
-			$hae = $yhteys->prepare("SELECT nimi FROM luokka ORDER BY nimi");
+			$hae = $yhteys->prepare("SELECT luokkaid, nimi FROM luokka ORDER BY nimi");
 			$hae->execute();
 			$kaikki = $hae->fetchAll();
 		?>
@@ -94,7 +98,7 @@ else {
 		<?php
 			for ($i=0; $i<count($kaikki); $i++) { 
 				$valinta = $kaikki[$i]["nimi"];
-				$valintaID = $kaikki[$i]["luokkaID"];
+				$valintaID = $kaikki[$i]["luokkaid"];
 		?>
 		<option value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
 		<?php } ?>
@@ -117,7 +121,7 @@ else {
 		<?php
 			for ($i=1; $i<6; $i++) {
 		?>
-			<option value=$i><?php echo $i ?></option>	
+			<option value="<?php echo $i ?>"><?php echo $i ?></option>	
 		<?php } ?>
 		</select>
 		</td>

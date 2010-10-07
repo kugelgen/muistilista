@@ -65,33 +65,41 @@ else {
 		</table>
 	</p>
 	<p>
-	<table align="center">
-	<col width="170px"/>
-	<col width="130px"/>
-	<col width="150px"/>	
-	<col width="150px"/>
-	<col width="150px"/>
-	<col width="60px"/>
+		<table align="center">
+		<col width="170px"/>
+		<col width="130px"/>
+		<col width="150px"/>	
+		<col width="150px"/>
+		<col width="150px"/>
+		<col width="60px"/>
+		
+		<?php 
+			$hae = $yhteys->prepare("SELECT a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY kirjaushetki");
+			$hae->execute();
+			$kaikki = $hae->fetchAll();
+			
+			for ($i=0; $i<count($kaikki); $i++) {
+				$askarenimi = $kaikki[$i]["askare"];
+				$luokannimi = $kaikki[$i]["luok"];
+				$kirjhetki = $kaikki[$i]["kirjaushetki"];
+				$dl = $kaikki[$i]["dl"];
+				$tarkeys = $kaikki[$i]["tarkeysaste"];
+		?>
+		
 		<tr>
-		<td>eka askare</td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
+		<td><?php echo $askarenimi ?></td>
+		<td><?php echo $luokannimi ?></td>
+		<td><?php echo $kirjhetki ?></td>
+		<td><?php echo $dl ?></td>
+		<td><?php echo $tarkeys ?></td>
 		<td class="noborder"><form><input type=image src="muokkaa.jpg" alt="Muokkaa"/>  <input type=image src="poista.jpg" alt="Poista"></form></td>
 		</tr>
-		<tr>
-		<td>toka askare</td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td class="noborder"><form><input type=image src="muokkaa.jpg" alt="Muokkaa"/>  <input type=image src="poista.jpg" alt="Poista"></form></td>
-		</tr>
+		
+		<?php } ?>
 	</table>
 	</p>
 	<p></p>
-
+	
 	</div>
 
 </div>
