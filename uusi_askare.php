@@ -124,7 +124,6 @@ else {
 		</tr>
 		
 		<?php 
-			$yhteys->beginTransaction();
 			$hae = $yhteys->prepare("SELECT luokkaid, nimi FROM luokka ORDER BY nimi");
 			$hae->execute();
 			$kaikki = $hae->fetchAll();
@@ -145,13 +144,13 @@ else {
 		</td>
 		</tr>
 		
-		<tr>
+<!--		<tr>
 		<td class="noborder">DL</td>
 		<td class="noborder"><form>
 		<input type="text" name="dl" value="" size="15" maxlength="10" />
 		</td>
 		</tr>
-		
+-->		
 		<tr>
 		<td class="noborder">Tärkeys</td>
 		<td class="noborder">

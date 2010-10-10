@@ -19,6 +19,10 @@ else {
 		} else if (isset($_POST['muokkaa'])) {
 			$_SESSION['a_id'] = $_POST['muokkaa'];
 			header('Location: uusi_askare.php');
+		} else if (isset($_POST['submit'])) {
+			$luokka = $_POST["luokat"];
+			$tark = $_POST["tarkeys"];
+			$luotu = $_POST["pvm"];
 		}
 ?>
 
@@ -48,27 +52,46 @@ else {
 	<col width="130px"/>
 	<col width="150px"/>	
 	<col width="150px"/>
-	<col width="150px"/>
+<!--	<col width="150px"/>-->
 	<col width="60px"/>
 		<tr align="center">
 		<th>Askare</th>
 		<th>Luokka</th>
-		<th>Luotu</th>
-		<th>DL</th>
 		<th>Tärkeys</th>
+		<th>Luotu</th>
+<!--		<th>DL</th>-->
 		</tr>
 		<tr>
 		<td class="noborder"></td>
+		<form action="<?php echo $PHP_SELF;?>" method="post">
 		<td class="noborder"><select name="luokat">
-		<option>Valitse</option>
-		<option>joku luokka</option>
-		</select></td>
-		<td class="noborder"><input type=radio name="pvm1" value="SELECT jotain" checked>uusin ensin<br>
-		<input type=radio name="pvm1" value="SELECT jotain muuta">vanhin ensin</td>
-		<td class="noborder"><input type=radio name="pvm2" value="SELECT jotain">ensimmäinen ^<br>
-		<input type=radio name="pvm2" value="SELECT jotain muuta">viimeinen ^</td>
-		<td class="noborder"><input type=radio name="tarkeys" value="SELECT jotain">1 ensin<br>
-		<input type=radio name="tarkeys" value="SELECT jotain muuta">5 ensin</td>
+		<?php 
+			$hae = $yhteys->prepare("SELECT luokkaid, nimi FROM luokka ORDER BY nimi");
+			$hae->execute();
+			$kaikki = $hae->fetchAll();
+		?>
+		<option value=0>Kaikki</option>
+		<?php
+			for ($i=0; $i<count($kaikki); $i++) { 
+				$valinta = $kaikki[$i]["nimi"];
+				$valintaID = $kaikki[$i]["luokkaid"];
+		?>
+		<option <?php if($luokka == $valintaID) echo "selected" ?> value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
+		<?php } ?>
+		</select>
+		</td>
+		
+		<td class="noborder"><select name="tarkeys">
+		<option value=0>Ei merkitystä</option>
+		<option <?php if($tark == 1) echo "selected" ?> value=1>1 ensin</option>
+		<option <?php if($tark == 2) echo "selected" ?> value=2>5 ensin</option>
+		
+-->		<td class="noborder"><input type=radio name="pvm" <?php if($luotu != 2) echo "checked" ?> value=1 >uusin ensin<br>
+		<input type=radio name="pvm" <?php if($luotu == 2) echo "checked" ?> value=2>vanhin ensin</td>
+<!--		<td class="noborder"><input type=radio name="pvm2" value=1>ensimmäinen ^<br>
+		<input type=radio name="pvm2" value=2>viimeinen ^</td>-->
+		<td class="noborder"><input type=submit name=submit value="Hae"/></td>
+		</form>
 		</tr>
 		</table>
 	</p>
@@ -78,12 +101,58 @@ else {
 		<col width="130px"/>
 		<col width="150px"/>	
 		<col width="150px"/>
-		<col width="150px"/>
+<!--		<col width="150px"/>-->
 		<col width="60px"/>
 		
 		<?php 
-			$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY kirjaushetki");
-			$hae->execute();
+			if ($luokka != 0 && $tark == 1 && $luotu == 2) {         //valittu luokka, tärkeys 1 ensin ja vanhin ensin
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste, kirjaushetki");
+				$hae->execute(array($luokka));
+			}
+			else if ($luokka != 0 && $tark == 2 && $luotu == 2) {    //valittu luokka, tärkeys 5 ensin ja vanhin ensin
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste DESC, kirjaushetki");
+				$hae->execute(array($luokka));
+			}
+			else if ($luokka != 0 && $tark == 1) {                   //valittu luokka, tärkeys 1 ensin (uusin ensin)
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste, kirjaushetki DESC");
+				$hae->execute(array($luokka));
+			}
+			else if ($luokka != 0 && $tark == 2) {                   //valittu luokka, tärkeys 5 ensin (uusin ensin)
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste DESC, kirjaushetki DESC");
+				$hae->execute(array($luokka));
+			}
+			else if ($luokka != 0 && $luotu == 2) {                  //valittu luokka ja vanhin ensin
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY a.kirjaushetki DESC");
+				$hae->execute(array($luokka));
+			}
+			else if ($luokka != 0) {                                 //valittu luokka (uusin ensin)
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY a.kirjaushetki DESC");
+				$hae->execute(array($luokka));
+			}
+			else if ($tark == 1 && $luotu == 2) {                    //valittu tärkeys 1 ensin ja vanhin ensin
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY tarkeysaste, kirjaushetki");
+				$hae->execute();
+			}
+			else if ($tark == 2 && $luotu == 2) {                    //valittu tärkeys 5 ensin ja vanhin ensin
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY tarkeysaste DESC, kirjaushetki");
+				$hae->execute();
+			}
+			else if ($tark == 1) {                                   //valittu tärkeys 1 ensin (uusin ensin)
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY tarkeysaste, kirjaushetki DESC");
+				$hae->execute();
+			}
+			else if ($tark == 2) {                                   //valittu tärkeys 5 ensin (uusin ensin)
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY tarkeysaste DESC, kirjaushetki DESC");
+				$hae->execute();
+			}
+			else if ($luotu == 2) {                                   //valittu vanhin ensin
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY kirjaushetki");
+				$hae->execute();
+			}
+			else {                                                    //uusin ensin (oletus)
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY kirjaushetki DESC");
+				$hae->execute();
+			}
 			$kaikki = $hae->fetchAll();
 			
 			for ($i=0; $i<count($kaikki); $i++) {
@@ -91,16 +160,17 @@ else {
 				$askarenimi = $kaikki[$i]["askare"];
 				$luokannimi = $kaikki[$i]["luok"];
 				$kirjhetki = $kaikki[$i]["kirjaushetki"];
-				$dl = $kaikki[$i]["dl"];
+//				$dl = $kaikki[$i]["dl"];
 				$tarkeys = $kaikki[$i]["tarkeysaste"];
 		?>
 		
 		<tr>
 		<td><?php echo $askarenimi ?></td>
 		<td><?php echo $luokannimi ?></td>
-		<td><?php echo $kirjhetki ?></td>
-		<td><?php echo $dl ?></td>
 		<td><?php echo $tarkeys ?></td>
+		<td><?php echo $kirjhetki ?></td>
+<!--		<td><?php// echo $dl ?></td>-->
+		
 		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post" >
 		<input type=image src="muokkaa.jpg" alt="muokkaa" name="muokkaa" value="<?php echo $askareenID ?>">  <input type=image src="poista.jpg" alt="poista" name="poista" value="<?php echo $askareenID ?>" ></form></td>
 		</tr>		

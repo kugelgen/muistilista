@@ -108,7 +108,6 @@ else {
 		</td>
 		</tr>
 		<?php 
-			$yhteys->beginTransaction();
 			$hae = $yhteys->prepare("SELECT nimi, luokkaid FROM luokka ORDER BY nimi");
 			$hae->execute();
 			$kaikki = $hae->fetchAll();
