@@ -7,11 +7,19 @@ if($_SESSION['kirjauduttu'] != '1') {
 }
 
 else {
-		
+	unset($_SESSION['l_id']);
+	unset($_SESSION['a_id']);
 	try {
-	$yhteys = new PDO("pgsql:host=localhost;dbname=kugelgen",
-		              "kugelgen", "d3626dddc9b387bc");	
-	$yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		include 'tietokanta.php';
+		
+		if (isset($_POST['poista'])) {
+			$askare = $_POST['poista'];
+			$poisto = $yhteys->prepare("DELETE FROM askare WHERE askareid=?");
+			$poisto->execute(array($askare));
+		} else if (isset($_POST['muokkaa'])) {
+			$_SESSION['a_id'] = $_POST['muokkaa'];
+			header('Location: uusi_askare.php');
+		}
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -74,11 +82,12 @@ else {
 		<col width="60px"/>
 		
 		<?php 
-			$hae = $yhteys->prepare("SELECT a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY kirjaushetki");
+			$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY kirjaushetki");
 			$hae->execute();
 			$kaikki = $hae->fetchAll();
 			
 			for ($i=0; $i<count($kaikki); $i++) {
+				$askareenID = $kaikki[$i]["askareid"];
 				$askarenimi = $kaikki[$i]["askare"];
 				$luokannimi = $kaikki[$i]["luok"];
 				$kirjhetki = $kaikki[$i]["kirjaushetki"];
@@ -92,9 +101,9 @@ else {
 		<td><?php echo $kirjhetki ?></td>
 		<td><?php echo $dl ?></td>
 		<td><?php echo $tarkeys ?></td>
-		<td class="noborder"><form><input type=image src="muokkaa.jpg" alt="Muokkaa"/>  <input type=image src="poista.jpg" alt="Poista"></form></td>
-		</tr>
-		
+		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post" >
+		<input type=image src="muokkaa.jpg" alt="muokkaa" name="muokkaa" value="<?php echo $askareenID ?>">  <input type=image src="poista.jpg" alt="poista" name="poista" value="<?php echo $askareenID ?>" ></form></td>
+		</tr>		
 		<?php } ?>
 	</table>
 	</p>

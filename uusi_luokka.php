@@ -7,36 +7,56 @@ if($_SESSION['kirjauduttu'] != '1') {
 }
 
 else {
-		
+	unset($_SESSION['a_id']);
 	try {
-	$yhteys = new PDO("pgsql:host=localhost;dbname=kugelgen",
-		              "kugelgen", "d3626dddc9b387bc");	
-	$yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		include 'tietokanta.php';
 	
-	if (isset($_POST['submit'])) {
+		if (isset($_POST['submit'])) {
 
 			$nimi = filter_input(INPUT_POST, "luokka", FILTER_SANITIZE_SPECIAL_CHARS);
 			$ylaluokka = $_POST["luokat"];
+			if ($ylaluokka == 0) $ylaluokka = NULL;
 			
 			$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE nimi=?");
 			$tarkista->execute(array($nimi));
 			$onko_olemassa = $tarkista->fetchObject();
 			
-			if ($onko_olemassa == FALSE) {
-			
-				$yhteys->beginTransaction();
-				if ($ylaluokka == 0) {
-					$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
-					$lisaaluokka->execute(array($nimi));
+			if (isset($_SESSION['l_id'])) {
+				$tama = $yhteys->prepare("SELECT nimi FROM luokka WHERE luokkaid=?");
+				$tama->execute(array($_SESSION['l_id']));
+				$tamanimi = $tama->fetchObject()->nimi;
+
+				if($onko_olemassa == TRUE && $nimi != $tamanimi) {
+					$virheteksti = 1;
 				}
 				else {
-					$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi, ylaluokka) VALUES (?, ?)");
-					$lisaaluokka->execute(array($nimi, $ylaluokka));
+					$muutayl = $yhteys->prepare("UPDATE luokka SET nimi=?, ylaluokka=? WHERE luokkaid=?");
+					$muutayl->execute(array($nimi, $ylaluokka, $_SESSION['l_id']));
+					header('Location: luokat.php');
 				}
-				$yhteys->commit();
-				header('Location: luokat.php');
+				 
 			}
+			else {
 			
+				if ($onko_olemassa == FALSE) {
+			
+					$yhteys->beginTransaction();
+					if ($ylaluokka == 0) {
+						$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
+						$lisaaluokka->execute(array($nimi));
+					}
+					else {
+						$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi, ylaluokka) VALUES (?, ?)");
+						$lisaaluokka->execute(array($nimi, $ylaluokka));
+					}
+					$yhteys->commit();
+					unset($_SESSION['l_id']);
+					header('Location: luokat.php');
+				}
+				else {
+					$virheteksti = 1;
+				}
+			}
 		}
 ?>
 
@@ -54,6 +74,9 @@ else {
 	<a href="etusivu.php">Etusivu</a> *
 	<a href="uusi_askare.php">Uusi askare</a> *  
 	<a href="luokat.php">Muokkaa luokkia</a> *
+	<?php if (isset($_SESSION['l_id'])) { ?>
+		<a href="tyhjennaluokka.php">Uusi luokka</a> * 
+	<?php } ?>
 	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 
@@ -65,10 +88,23 @@ else {
 	<table align="center">
 	<col width="130px"/>
 	<col width="170px"/>
+	
+		<?php	
+		if(isset($_SESSION['l_id'])) {
+			$luokid = $_SESSION['l_id'];
+			$tiedot = $yhteys->prepare("SELECT luokkaid, nimi, '' as ylaluokka FROM luokka WHERE luokkaid=? AND ylaluokka is null UNION SELECT A.luokkaid, A.nimi, B.nimi as ylaluokka FROM luokka A, luokka B WHERE A.luokkaid=? AND A.ylaluokka=B.luokkaid");
+			$tiedot->execute(array($luokid, $luokid));
+			$pohjatiedot = $tiedot->fetchAll();
+			$tiedotid = $pohjatiedot[0]["luokkaid"];
+			$tiedotnimi = $pohjatiedot[0]["nimi"];
+			$ylaluok = $pohjatiedot[0]["ylaluokka"];
+		}
+		?>
+	
 		<tr>
 		<td class="noborder">Nimi</td>
 		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post">
-		<input type="text" name="luokka" value="" size="15" maxlength="10" />
+		<input type="text" name="luokka" value="<?php echo $tiedotnimi ?>" size="15" maxlength="10" />
 		</td>
 		</tr>
 		<?php 
@@ -81,14 +117,18 @@ else {
 		<td class="noborder">Yläluokka</td>
 		<td class="noborder">
 		<select name="luokat">
-		<option value=0>Valitse</option>
+		<option value=0>Ei mitään</option>
 		<?php
 			for ($i=0; $i<count($kaikki); $i++) { 
 				$valinta = $kaikki[$i]["nimi"];
 				$valintaID = $kaikki[$i]["luokkaid"];
+				if ($valintaID != $_SESSION['l_id']) {
 		?>
-		<option value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
-		<?php } ?>
+		<option <?php if($ylaluok == $valinta) echo "selected" ?> value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
+		
+		<?php
+				}
+			} ?>
 		
 		</select>
 		</td>
@@ -102,7 +142,7 @@ else {
 		</form>
 		
 		<?php
-		if ($onko_olemassa != FALSE) {
+		if ($virheteksti == 1) {
 			echo "Luokka $nimi löytyy jo.";
 		}
 		?>

@@ -9,44 +9,64 @@ if($_SESSION['kirjauduttu'] != '1') {
 else {
 		
 	try {
-	$yhteys = new PDO("pgsql:host=localhost;dbname=kugelgen",
-		              "kugelgen", "d3626dddc9b387bc");	
-	$yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		unset($_SESSION['l_id']);
+		include 'tietokanta.php';
 	
-	if (isset($_POST['submit'])) {
+		if (isset($_POST['submit'])) {
 
 			$nimi = filter_input(INPUT_POST, "nimi", FILTER_SANITIZE_SPECIAL_CHARS);
 			$luokka = $_POST["luokat"];
+			if ($luokka == 0) $luokka = NULL;
 			$tarkeys = $_POST["tarkeys"];
+			if ($tarkeys == 0) $tarkeys = NULL;
 			$pvm = date(DATE_ATOM, $_SERVER['REQUEST_TIME']);
 			
 			$tarkista = $yhteys->prepare("SELECT nimi FROM askare WHERE nimi=?");
 			$tarkista->execute(array($nimi));
 			$onko_olemassa = $tarkista->fetchObject();
 			
-			if ($onko_olemassa == FALSE) {
-			
-				$yhteys->beginTransaction();
-				if ($luokka == 0 && $tarkeys == 0) {
-					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki) VALUES (?, ?)");
-					$lisaa_askare->execute(array($nimi, $pvm));
-				}
-				else if ($tarkeys == 0) {
-					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka) VALUES (?, ?, ?)");
-					$lisaa_askare->execute(array($nimi, $pvm, $luokka));
-				}
-				else if ($luokka == 0) {
-					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, tarkeysaste) VALUES (?, ?, ?)");
-					$lisaa_askare->execute(array($nimi, $pvm, $tarkeys));
+			if (isset($_SESSION['a_id'])) {				//muokataan
+				$tama = $yhteys->prepare("SELECT nimi FROM askare WHERE askareid=?");
+				$tama->execute(array($_SESSION['a_id']));
+				$tamanimi = $tama->fetchObject()->nimi;
+
+				if($onko_olemassa == TRUE && $nimi != $tamanimi) {
+					$virheteksti = 1;
 				}
 				else {
-					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tarkeysaste) VALUES (?, ?, ?, ?)");
-					$lisaa_askare->execute(array($nimi, $pvm, $luokka, $tarkeys));
+					$muuta = $yhteys->prepare("UPDATE askare SET nimi=?, tarkeysaste=?, luokka=? WHERE askareid=?");
+					$muuta->execute(array($nimi, $tarkeys, $luokka, $_SESSION['a_id']));
+					header('Location: etusivu.php');
 				}
-				$yhteys->commit();
-				header('Location: etusivu.php');
+				
 			}
+			else {										//lisätään uusi
+				if ($onko_olemassa == FALSE) {
 			
+					$yhteys->beginTransaction();
+/*					if ($luokka == 0 && $tarkeys == 0) {
+						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki) VALUES (?, ?)");
+						$lisaa_askare->execute(array($nimi, $pvm));
+					}
+					else if ($tarkeys == 0) {
+						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka) VALUES (?, ?, ?)");
+						$lisaa_askare->execute(array($nimi, $pvm, $luokka));
+					}
+					else if ($luokka == 0) {
+						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, tarkeysaste) VALUES (?, ?, ?)");
+						$lisaa_askare->execute(array($nimi, $pvm, $tarkeys));
+					}
+					else {
+*/						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tarkeysaste) VALUES (?, ?, ?, ?)");
+						$lisaa_askare->execute(array($nimi, $pvm, $luokka, $tarkeys));
+//					}
+					$yhteys->commit();
+					header('Location: etusivu.php');
+				}
+				else {
+					$virheteksti = 1;
+				}
+			}
 		}
 ?>
 
@@ -61,10 +81,13 @@ else {
 </head>
 
 <div class="headnav">
-  <a href="etusivu.php">Etusivu</a> * 
-  <a href="uusi_luokka.php">Uusi luokka</a> * 
-  <a href="luokat.php">Muokkaa luokkia</a> *
-  <a href="uloskirjautuminen.php">Kirjaudu ulos</a>
+	<a href="etusivu.php">Etusivu</a> * 
+	<?php if (isset($_SESSION['a_id'])) { ?>
+		<a href="tyhjennaaskare.php">Uusi askare</a> * 
+	<?php } ?>
+	<a href="uusi_luokka.php">Uusi luokka</a> * 
+	<a href="luokat.php">Muokkaa luokkia</a> *
+	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 
 <div class="pienikehys">
@@ -76,11 +99,27 @@ else {
 	<table align="center">
 	<col width="130px"/>
 	<col width="170px"/>
+	
+	
+		<?php	
+		if(isset($_SESSION['a_id'])) {
+			$askareid = $_SESSION['a_id'];
+			$tiedot = $yhteys->prepare("SELECT askareid, nimi, tarkeysaste, luokka FROM askare WHERE askareid=?");
+			$tiedot->execute(array($askareid));
+			$pohjatiedot = $tiedot->fetchAll();
+			$tiedotid = $pohjatiedot[0]["askareid"];
+			$tiedotnimi = $pohjatiedot[0]["nimi"];
+			$tiedottark = $pohjatiedot[0]["tarkeysaste"];
+			$tiedotluok = $pohjatiedot[0]["luokka"];
+		}
+		?>
+	
+	
 		<tr>
 		<td class="noborder">Nimi</td>
 		<td class="noborder">
 		<form action="<?php echo $PHP_SELF;?>" method="post">
-		<input type="text" name="nimi" value="" size="20" maxlength="20" />
+		<input type="text" name="nimi" value="<?php echo $tiedotnimi ?>" size="20" maxlength="20" />
 		</td>
 		</tr>
 		
@@ -94,13 +133,13 @@ else {
 		<td class="noborder">Luokka</td>
 		<td class="noborder">
 		<select name="luokat">
-		<option value=0>Valitse</option>
+		<option value=0>Ei mitään</option>
 		<?php
 			for ($i=0; $i<count($kaikki); $i++) { 
 				$valinta = $kaikki[$i]["nimi"];
 				$valintaID = $kaikki[$i]["luokkaid"];
 		?>
-		<option value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
+		<option <?php if($tiedotluok == $valintaID) echo "selected" ?> value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
 		<?php } ?>
 		</select>
 		</td>
@@ -117,11 +156,11 @@ else {
 		<td class="noborder">Tärkeys</td>
 		<td class="noborder">
 		<select name="tarkeys">
-		<option value=0>Valitse</option>
+		<option value=0>Ei mitään</option>
 		<?php
 			for ($i=1; $i<6; $i++) {
 		?>
-			<option value="<?php echo $i ?>"><?php echo $i ?></option>	
+			<option <?php if($tiedottark == $i) echo "selected" ?> value="<?php echo $i ?>"><?php echo $i ?></option>	
 		<?php } ?>
 		</select>
 		</td>
@@ -133,6 +172,11 @@ else {
 		
 		<p align=right><input type=submit name=submit value="Tallenna"/></p>
 		</form>
+		<?php
+		if ($virheteksti == 1) {
+			echo "Askare $nimi löytyy jo.";
+		}
+		?>
 	</p>
 	<p></p>
 

@@ -1,12 +1,12 @@
 <?php 
 	session_start(); 	
 	try {
-		$yhteys = new PDO("pgsql:host=localhost;dbname=kugelgen",
-						"kugelgen", "d3626dddc9b387bc");	
-		$yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		include 'tietokanta.php';
 		session_start();
 	
 		$_SESSION['kirjauduttu'] = '0';
+		unset($_SESSION['l_id']);
+		unset($_SESSION['a_id']);
 		
 		$salasana = filter_input(INPUT_POST, "salasana", FILTER_SANITIZE_SPECIAL_CHARS);
 		if($salasana == 'testisala') {

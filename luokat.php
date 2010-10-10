@@ -7,11 +7,10 @@ if($_SESSION['kirjauduttu'] != '1') {
 }
 
 else {
-		
+	unset($_SESSION['l_id']);
+	unset($_SESSION['a_id']);
 	try {
-	$yhteys = new PDO("pgsql:host=localhost;dbname=kugelgen",
-		              "kugelgen", "d3626dddc9b387bc");	
-	$yhteys->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		include 'tietokanta.php';
 	
 		if (isset($_POST['poista'])) {
 			$luokka = $_POST['poista'];
