@@ -86,8 +86,8 @@ else {
 		
 		<td class="noborder"><select name="tarkeys">
 		<option value=0>Ei merkitystä</option>
-		<option <?php if($tark == 1) echo "selected" ?> value=1>1 ensin</option>
-		<option <?php if($tark == 2) echo "selected" ?> value=2>5 ensin</option>
+		<option <?php if($tark == 1) echo "selected" ?> value=1>nouseva</option>
+		<option <?php if($tark == 2) echo "selected" ?> value=2>laskeva</option>
 		
 -->		<td class="noborder"><input type=radio name="pvm" <?php if($luotu != 2) echo "checked" ?> value=1 >uusin ensin<br>
 		<input type=radio name="pvm" <?php if($luotu == 2) echo "checked" ?> value=2>vanhin ensin</td>
