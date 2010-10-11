@@ -21,6 +21,10 @@ else {
 			$tarkista->execute(array($nimi));
 			$onko_olemassa = $tarkista->fetchObject();
 			
+			$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE luokkaid=? AND ylaluokka IS NOT NULL");
+			$tarkista->execute(array($ylaluokka));
+			$onko_alaluokka = $tarkista->fetchObject();
+			
 			if (isset($_SESSION['l_id'])) {
 				$tama = $yhteys->prepare("SELECT nimi FROM luokka WHERE luokkaid=?");
 				$tama->execute(array($_SESSION['l_id']));
@@ -29,6 +33,7 @@ else {
 				if($onko_olemassa == TRUE && $nimi != $tamanimi) {
 					$virheteksti = 1;
 				}
+				
 				else {
 					$muutayl = $yhteys->prepare("UPDATE luokka SET nimi=?, ylaluokka=? WHERE luokkaid=?");
 					$muutayl->execute(array($nimi, $ylaluokka, $_SESSION['l_id']));
@@ -39,7 +44,7 @@ else {
 			else {
 			
 				if ($onko_olemassa == FALSE) {
-			
+					
 					$yhteys->beginTransaction();
 					if ($ylaluokka == 0) {
 						$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
@@ -71,9 +76,9 @@ else {
 </head>
 
 <div class="headnav">
-	<a href="etusivu.php">Etusivu</a> *
-	<a href="uusi_askare.php">Uusi askare</a> *  
-	<a href="luokat.php">Muokkaa luokkia</a> *
+	<a href="etusivu.php">Askareet</a> * 
+	<a href="luokat.php">Luokat</a> * 
+	<a href="uusi_askare.php">Uusi askare</a> * 
 	<?php if (isset($_SESSION['l_id'])) { ?>
 		<a href="tyhjennaluokka.php">Uusi luokka</a> * 
 	<?php } ?>
@@ -108,9 +113,14 @@ else {
 		</td>
 		</tr>
 		<?php 
-			$hae = $yhteys->prepare("SELECT nimi, luokkaid FROM luokka ORDER BY nimi");
+			$hae = $yhteys->prepare("SELECT nimi, luokkaid FROM luokka WHERE ylaluokka IS NULL ORDER BY nimi");
 			$hae->execute();
 			$kaikki = $hae->fetchAll();
+			if(isset($_SESSION['l_id'])) {
+				$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE ylaluokka=?");
+				$tarkista->execute(array($_SESSION['l_id']));
+				$onko_ylaluokka = $tarkista->fetchObject();
+			}
 		?>
 		<tr>
 		<td class="noborder">Yläluokka</td>
@@ -118,14 +128,16 @@ else {
 		<select name="luokat">
 		<option value=0>Ei mitään</option>
 		<?php
-			for ($i=0; $i<count($kaikki); $i++) { 
-				$valinta = $kaikki[$i]["nimi"];
-				$valintaID = $kaikki[$i]["luokkaid"];
-				if ($valintaID != $_SESSION['l_id']) {
+			if ($onko_ylaluokka == FALSE) {
+				for ($i=0; $i<count($kaikki); $i++) { 
+					$valinta = $kaikki[$i]["nimi"];
+					$valintaID = $kaikki[$i]["luokkaid"];
+					if ($valintaID != $_SESSION['l_id']) {
 		?>
 		<option <?php if($ylaluok == $valinta) echo "selected" ?> value="<?php echo $valintaID ?>"><?php echo $valinta ?></option>
 		
 		<?php
+					}
 				}
 			} ?>
 		

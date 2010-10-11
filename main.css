@@ -13,12 +13,16 @@ a:visited {color:#660033;}
 
 .kehys {
 	margin: 50px auto auto;
-	width: 880px;
+	width: 780px;
+}
+
+.keskikehys {
+	margin: 50px auto auto;
+	width: 500px;
 }
 
 .pienikehys {
 	margin: 50px auto auto;
-	text-align: right;
 	width: 450px;
 }
 

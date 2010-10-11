@@ -25,7 +25,7 @@ else {
 			$tarkista->execute(array($nimi));
 			$onko_olemassa = $tarkista->fetchObject();
 			
-			if (isset($_SESSION['a_id'])) {				//muokataan
+			if (isset($_SESSION['a_id'])) {                          //muokataan
 				$tama = $yhteys->prepare("SELECT nimi FROM askare WHERE askareid=?");
 				$tama->execute(array($_SESSION['a_id']));
 				$tamanimi = $tama->fetchObject()->nimi;
@@ -40,26 +40,11 @@ else {
 				}
 				
 			}
-			else {										//lisätään uusi
+			else {                                                   //lisätään uusi
 				if ($onko_olemassa == FALSE) {
-			
 					$yhteys->beginTransaction();
-/*					if ($luokka == 0 && $tarkeys == 0) {
-						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki) VALUES (?, ?)");
-						$lisaa_askare->execute(array($nimi, $pvm));
-					}
-					else if ($tarkeys == 0) {
-						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka) VALUES (?, ?, ?)");
-						$lisaa_askare->execute(array($nimi, $pvm, $luokka));
-					}
-					else if ($luokka == 0) {
-						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, tarkeysaste) VALUES (?, ?, ?)");
-						$lisaa_askare->execute(array($nimi, $pvm, $tarkeys));
-					}
-					else {
-*/						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tarkeysaste) VALUES (?, ?, ?, ?)");
-						$lisaa_askare->execute(array($nimi, $pvm, $luokka, $tarkeys));
-//					}
+					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tarkeysaste) VALUES (?, ?, ?, ?)");
+					$lisaa_askare->execute(array($nimi, $pvm, $luokka, $tarkeys));
 					$yhteys->commit();
 					header('Location: etusivu.php');
 				}
@@ -81,12 +66,12 @@ else {
 </head>
 
 <div class="headnav">
-	<a href="etusivu.php">Etusivu</a> * 
+	<a href="etusivu.php">Askareet</a> * 
+	<a href="luokat.php">Luokat</a> * 
 	<?php if (isset($_SESSION['a_id'])) { ?>
 		<a href="tyhjennaaskare.php">Uusi askare</a> * 
 	<?php } ?>
 	<a href="uusi_luokka.php">Uusi luokka</a> * 
-	<a href="luokat.php">Muokkaa luokkia</a> *
 	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 

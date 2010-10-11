@@ -37,10 +37,13 @@ else {
 </head>
 
 <div class="headnav">
-  <a href="uusi_askare.php">Uusi askare</a> * 
-  <a href="uusi_luokka.php">Uusi luokka</a> * 
-  <a href="luokat.php">Muokkaa luokkia</a> *
-  <a href="uloskirjautuminen.php">Kirjaudu ulos</a>
+	<?php if (isset($_POST['submit'])) { ?>
+		<a href="tyhjenna.php">Askareet</a> * 
+	<?php } ?>
+	<a href="luokat.php">Luokat</a> * 
+	<a href="uusi_askare.php">Uusi askare</a> * 
+	<a href="uusi_luokka.php">Uusi luokka</a> * 
+	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 
 <div class="kehys">
@@ -53,7 +56,7 @@ else {
 	<col width="150px"/>	
 	<col width="150px"/>
 <!--	<col width="150px"/>-->
-	<col width="60px"/>
+	<col width="55px"/>
 		<tr align="center">
 		<th>Askare</th>
 		<th>Luokka</th>
@@ -61,7 +64,7 @@ else {
 		<th>Luotu</th>
 <!--		<th>DL</th>-->
 		</tr>
-		<tr>
+		<tr align="center">
 		<td class="noborder"></td>
 		<form action="<?php echo $PHP_SELF;?>" method="post">
 		<td class="noborder"><select name="luokat">
@@ -90,7 +93,7 @@ else {
 		<input type=radio name="pvm" <?php if($luotu == 2) echo "checked" ?> value=2>vanhin ensin</td>
 <!--		<td class="noborder"><input type=radio name="pvm2" value=1>ensimmäinen ^<br>
 		<input type=radio name="pvm2" value=2>viimeinen ^</td>-->
-		<td class="noborder"><input type=submit name=submit value="Hae"/></td>
+		<td align="right" class="noborder"><input type=submit name=submit value="Hae"/></td>
 		</form>
 		</tr>
 		</table>
@@ -102,32 +105,32 @@ else {
 		<col width="150px"/>	
 		<col width="150px"/>
 <!--		<col width="150px"/>-->
-		<col width="60px"/>
+		<col width="55px"/>
 		
 		<?php 
 			if ($luokka != 0 && $tark == 1 && $luotu == 2) {         //valittu luokka, tärkeys 1 ensin ja vanhin ensin
-				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste, kirjaushetki");
-				$hae->execute(array($luokka));
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? UNION SELECT a.askareid, a.nimi as askare, l1.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l1, luokka l2 WHERE a.luokka = l1.luokkaid AND l1.ylaluokka = l2.luokkaid AND l2.luokkaid=? ORDER BY tarkeysaste, kirjaushetki");
+				$hae->execute(array($luokka, $luokka));
 			}
 			else if ($luokka != 0 && $tark == 2 && $luotu == 2) {    //valittu luokka, tärkeys 5 ensin ja vanhin ensin
-				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste DESC, kirjaushetki");
-				$hae->execute(array($luokka));
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? UNION SELECT a.askareid, a.nimi as askare, l1.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l1, luokka l2 WHERE a.luokka = l1.luokkaid AND l1.ylaluokka = l2.luokkaid AND l2.luokkaid=? ORDER BY tarkeysaste DESC, kirjaushetki");
+				$hae->execute(array($luokka, $luokka));
 			}
 			else if ($luokka != 0 && $tark == 1) {                   //valittu luokka, tärkeys 1 ensin (uusin ensin)
-				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste, kirjaushetki DESC");
-				$hae->execute(array($luokka));
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? UNION SELECT a.askareid, a.nimi as askare, l1.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l1, luokka l2 WHERE a.luokka = l1.luokkaid AND l1.ylaluokka = l2.luokkaid AND l2.luokkaid=? ORDER BY tarkeysaste, kirjaushetki DESC");
+				$hae->execute(array($luokka, $luokka));
 			}
 			else if ($luokka != 0 && $tark == 2) {                   //valittu luokka, tärkeys 5 ensin (uusin ensin)
-				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY tarkeysaste DESC, kirjaushetki DESC");
-				$hae->execute(array($luokka));
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? UNION SELECT a.askareid, a.nimi as askare, l1.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l1, luokka l2 WHERE a.luokka = l1.luokkaid AND l1.ylaluokka = l2.luokkaid AND l2.luokkaid=? ORDER BY tarkeysaste DESC, kirjaushetki DESC");
+				$hae->execute(array($luokka, $luokka));
 			}
 			else if ($luokka != 0 && $luotu == 2) {                  //valittu luokka ja vanhin ensin
-				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY a.kirjaushetki DESC");
-				$hae->execute(array($luokka));
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? UNION SELECT a.askareid, a.nimi as askare, l1.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l1, luokka l2 WHERE a.luokka = l1.luokkaid AND l1.ylaluokka = l2.luokkaid AND l2.luokkaid=? ORDER BY kirjaushetki");
+				$hae->execute(array($luokka, $luokka));
 			}
 			else if ($luokka != 0) {                                 //valittu luokka (uusin ensin)
-				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? ORDER BY a.kirjaushetki DESC");
-				$hae->execute(array($luokka));
+				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid AND a.luokka=? UNION SELECT a.askareid, a.nimi as askare, l1.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l1, luokka l2 WHERE a.luokka = l1.luokkaid AND l1.ylaluokka = l2.luokkaid AND l2.luokkaid=? ORDER BY kirjaushetki DESC");
+				$hae->execute(array($luokka, $luokka));
 			}
 			else if ($tark == 1 && $luotu == 2) {                    //valittu tärkeys 1 ensin ja vanhin ensin
 				$hae = $yhteys->prepare("SELECT a.askareid, a.nimi as askare, l.nimi as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a, luokka l WHERE a.luokka = l.luokkaid UNION SELECT a.askareid, a.nimi as askare, NULL as luok, a.kirjaushetki, a.dl, a.tarkeysaste FROM askare a WHERE a.luokka is null ORDER BY tarkeysaste, kirjaushetki");
