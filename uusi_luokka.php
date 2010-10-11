@@ -81,6 +81,8 @@ else {
 	<a href="uusi_askare.php">Uusi askare</a> * 
 	<?php if (isset($_SESSION['l_id'])) { ?>
 		<a href="tyhjennaluokka.php">Uusi luokka</a> * 
+	<?php } else { ?>
+		Uusi luokka * 
 	<?php } ?>
 	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>

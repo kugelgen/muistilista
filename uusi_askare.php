@@ -70,6 +70,8 @@ else {
 	<a href="luokat.php">Luokat</a> * 
 	<?php if (isset($_SESSION['a_id'])) { ?>
 		<a href="tyhjennaaskare.php">Uusi askare</a> * 
+	<?php } else { ?>
+		Uusi askare * 
 	<?php } ?>
 	<a href="uusi_luokka.php">Uusi luokka</a> * 
 	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>

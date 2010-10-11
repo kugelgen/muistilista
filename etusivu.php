@@ -39,6 +39,8 @@ else {
 <div class="headnav">
 	<?php if (isset($_POST['submit'])) { ?>
 		<a href="tyhjenna.php">Askareet</a> * 
+	<?php } else { ?>
+		Askareet * 
 	<?php } ?>
 	<a href="luokat.php">Luokat</a> * 
 	<a href="uusi_askare.php">Uusi askare</a> * 
@@ -175,7 +177,7 @@ else {
 <!--		<td><?php// echo $dl ?></td>-->
 		
 		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post" >
-		<input type=image src="muokkaa.jpg" alt="muokkaa" name="muokkaa" value="<?php echo $askareenID ?>">  <input type=image src="poista.jpg" alt="poista" name="poista" value="<?php echo $askareenID ?>" ></form></td>
+		<input type=image src="muokkaa.jpg" alt="muokkaa" title="muokkaa" name="muokkaa" value="<?php echo $askareenID ?>">  <input type=image src="poista.jpg" alt="poista" title="poista" name="poista" value="<?php echo $askareenID ?>" ></form></td>
 		</tr>		
 		<?php } ?>
 	</table>

@@ -56,6 +56,7 @@ else {
 
 <div class="headnav">
   <a href="etusivu.php">Askareet</a> * 
+  Luokat * 
   <a href="uusi_askare.php">Uusi askare</a> *  
   <a href="uusi_luokka.php">Uusi luokka</a> * 
   <a href="uloskirjautuminen.php">Kirjaudu ulos</a>
@@ -97,7 +98,7 @@ else {
 		<td><?php echo $luokannimi ?></td>
 		<td><?php echo $ylaluokannimi ?></td>
 		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post" >
-		<input type=image src="muokkaa.jpg" alt="muokkaa" name="muokkaa" value="<?php echo $luokanID ?>">  <input type=image src="poista.jpg" alt="poista" name="poista" value="<?php echo $luokanID ?>" ></form></td>
+		<input type=image src="muokkaa.jpg" alt="muokkaa" title="muokkaa" name="muokkaa" value="<?php echo $luokanID ?>">  <input type=image src="poista.jpg" alt="poista" title="poista" name="poista" value="<?php echo $luokanID ?>" ></form></td>
 		</tr>
 		<?php } ?>
 	</table>
