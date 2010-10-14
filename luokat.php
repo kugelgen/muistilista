@@ -39,7 +39,7 @@ else {
 			}
 		} else if (isset($_POST['muokkaa'])) {
 			$_SESSION['l_id'] = $_POST['muokkaa'];
-			header('Location: uusi_luokka.php');
+			header('Location: luokka.php');
 		}
 	
 ?>
@@ -57,8 +57,8 @@ else {
 <div class="headnav">
   <a href="etusivu.php">Askareet</a> * 
   Luokat * 
-  <a href="uusi_askare.php">Uusi askare</a> *  
-  <a href="uusi_luokka.php">Uusi luokka</a> * 
+  <a href="askare.php">Uusi askare</a> *  
+  <a href="luokka.php">Uusi luokka</a> * 
   <a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 
@@ -66,7 +66,14 @@ else {
 	<div class="ruutu">
 
 	<h2>Luokat</h2>	
-
+	<?php
+		if ($virheteksti == 1) {
+			echo "Et voi poistaa luokkaa $lnimi, sillä se on käytössä yläluokkana.";
+		}
+		if ($virheteksti == 2) {
+			echo "Et voi poistaa luokkaa $lnimi, sillä se on käytössä yhden tai useamman askareen luokkana.";
+		}
+	?>
 	<p>
 	<table align="center">
 	<col width="150px"/>
@@ -104,14 +111,6 @@ else {
 	</table>
 	</p>
 	<p></p>
-		<?php
-		if ($virheteksti == 1) {
-			echo "Et voi poistaa luokkaa $lnimi, sillä se on käytössä yläluokkana.";
-		}
-		if ($virheteksti == 2) {
-			echo "Et voi poistaa luokkaa $lnimi, sillä se on käytössä yhden tai useamman askareen luokkana.";
-		}
-		?>
 </div>
 </div>
 <?php	} catch (PDOException $e) {

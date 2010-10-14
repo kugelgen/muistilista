@@ -73,7 +73,7 @@ else {
 	<?php } else { ?>
 		Uusi askare * 
 	<?php } ?>
-	<a href="uusi_luokka.php">Uusi luokka</a> * 
+	<a href="luokka.php">Uusi luokka</a> * 
 	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 
@@ -81,7 +81,11 @@ else {
 	<div class="ruutu">
 	
 	<h2>Askare</h2>	
-	
+	<?php
+		if ($virheteksti == 1) {
+			echo "Askare $nimi löytyy jo.";
+		}
+	?>
 	<p>
 	<table align="center">
 	<col width="130px"/>
@@ -158,11 +162,6 @@ else {
 		
 		<p align=right><input type=submit name=submit value="Tallenna"/></p>
 		</form>
-		<?php
-		if ($virheteksti == 1) {
-			echo "Askare $nimi löytyy jo.";
-		}
-		?>
 	</p>
 	<p></p>
 

@@ -18,7 +18,7 @@ else {
 			$poisto->execute(array($askare));
 		} else if (isset($_POST['muokkaa'])) {
 			$_SESSION['a_id'] = $_POST['muokkaa'];
-			header('Location: uusi_askare.php');
+			header('Location: askare.php');
 		} else if (isset($_POST['submit'])) {
 			$luokka = $_POST["luokat"];
 			$tark = $_POST["tarkeys"];
@@ -43,8 +43,8 @@ else {
 		Askareet * 
 	<?php } ?>
 	<a href="luokat.php">Luokat</a> * 
-	<a href="uusi_askare.php">Uusi askare</a> * 
-	<a href="uusi_luokka.php">Uusi luokka</a> * 
+	<a href="askare.php">Uusi askare</a> * 
+	<a href="luokka.php">Uusi luokka</a> * 
 	<a href="uloskirjautuminen.php">Kirjaudu ulos</a>
 </div>
 

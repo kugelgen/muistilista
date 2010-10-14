@@ -78,7 +78,7 @@ else {
 <div class="headnav">
 	<a href="etusivu.php">Askareet</a> * 
 	<a href="luokat.php">Luokat</a> * 
-	<a href="uusi_askare.php">Uusi askare</a> * 
+	<a href="askare.php">Uusi askare</a> * 
 	<?php if (isset($_SESSION['l_id'])) { ?>
 		<a href="tyhjennaluokka.php">Uusi luokka</a> * 
 	<?php } else { ?>
@@ -91,6 +91,11 @@ else {
 	<div class="ruutu">
 	
 	<h2>Luokka</h2>	
+	<?php
+		if ($virheteksti == 1) {
+			echo "Luokka $nimi löytyy jo.";
+		}
+	?>
 	<p>
 	<table align="center">
 	<col width="130px"/>
@@ -153,12 +158,6 @@ else {
 	<p>
 		<p align=right><input type=submit name=submit value="Tallenna"/></p>
 		</form>
-		
-		<?php
-		if ($virheteksti == 1) {
-			echo "Luokka $nimi löytyy jo.";
-		}
-		?>
 	</p>
 	<p></p>
 
