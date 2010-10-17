@@ -57,14 +57,12 @@ else {
 	<col width="130px"/>
 	<col width="150px"/>	
 	<col width="150px"/>
-<!--	<col width="150px"/>-->
 	<col width="55px"/>
 		<tr align="center">
 		<th>Askare</th>
 		<th>Luokka</th>
 		<th>Tärkeys</th>
 		<th>Luotu</th>
-<!--		<th>DL</th>-->
 		</tr>
 		<tr align="center">
 		<td class="noborder"></td>
@@ -93,8 +91,6 @@ else {
 		
 -->		<td class="noborder"><input type=radio name="pvm" <?php if($luotu != 2) echo "checked" ?> value=1 >uusin ensin<br>
 		<input type=radio name="pvm" <?php if($luotu == 2) echo "checked" ?> value=2>vanhin ensin</td>
-<!--		<td class="noborder"><input type=radio name="pvm2" value=1>ensimmäinen ^<br>
-		<input type=radio name="pvm2" value=2>viimeinen ^</td>-->
 		<td align="right" class="noborder"><input type=submit name=submit value="Hae"/></td>
 		</form>
 		</tr>
@@ -106,7 +102,6 @@ else {
 		<col width="130px"/>
 		<col width="150px"/>	
 		<col width="150px"/>
-<!--		<col width="150px"/>-->
 		<col width="55px"/>
 		
 		<?php 
@@ -165,7 +160,6 @@ else {
 				$askarenimi = $kaikki[$i]["askare"];
 				$luokannimi = $kaikki[$i]["luok"];
 				$kirjhetki = $kaikki[$i]["kirjaushetki"];
-//				$dl = $kaikki[$i]["dl"];
 				$tarkeys = $kaikki[$i]["tarkeysaste"];
 		?>
 		
@@ -174,7 +168,6 @@ else {
 		<td><?php echo $luokannimi ?></td>
 		<td><?php echo $tarkeys ?></td>
 		<td><?php echo $kirjhetki ?></td>
-<!--		<td><?php// echo $dl ?></td>-->
 		
 		<td class="noborder"><form action="<?php echo $PHP_SELF;?>" method="post" >
 		<input type=image src="muokkaa.jpg" alt="muokkaa" title="muokkaa" name="muokkaa" value="<?php echo $askareenID ?>">  <input type=image src="poista.jpg" alt="poista" title="poista" name="poista" value="<?php echo $askareenID ?>" ></form></td>

@@ -14,52 +14,57 @@ else {
 		if (isset($_POST['submit'])) {
 
 			$nimi = filter_input(INPUT_POST, "luokka", FILTER_SANITIZE_SPECIAL_CHARS);
-			$ylaluokka = $_POST["luokat"];
-			if ($ylaluokka == 0) $ylaluokka = NULL;
-			
-			$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE nimi=?");
-			$tarkista->execute(array($nimi));
-			$onko_olemassa = $tarkista->fetchObject();
-			
-			$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE luokkaid=? AND ylaluokka IS NOT NULL");
-			$tarkista->execute(array($ylaluokka));
-			$onko_alaluokka = $tarkista->fetchObject();
-			
-			if (isset($_SESSION['l_id'])) {
-				$tama = $yhteys->prepare("SELECT nimi FROM luokka WHERE luokkaid=?");
-				$tama->execute(array($_SESSION['l_id']));
-				$tamanimi = $tama->fetchObject()->nimi;
-
-				if($onko_olemassa == TRUE && $nimi != $tamanimi) {
-					$virheteksti = 1;
-				}
-				
-				else {
-					$muutayl = $yhteys->prepare("UPDATE luokka SET nimi=?, ylaluokka=? WHERE luokkaid=?");
-					$muutayl->execute(array($nimi, $ylaluokka, $_SESSION['l_id']));
-					header('Location: luokat.php');
-				}
-				 
+			if ($nimi == "") {
+				$virheteksti = 1;
 			}
 			else {
-			
-				if ($onko_olemassa == FALSE) {
+				$ylaluokka = $_POST["luokat"];
+				if ($ylaluokka == 0) $ylaluokka = NULL;
+				
+				$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE nimi=?");
+				$tarkista->execute(array($nimi));
+				$onko_olemassa = $tarkista->fetchObject();
+				
+				$tarkista = $yhteys->prepare("SELECT nimi FROM luokka WHERE luokkaid=? AND ylaluokka IS NOT NULL");
+				$tarkista->execute(array($ylaluokka));
+				$onko_alaluokka = $tarkista->fetchObject();
+				
+				if (isset($_SESSION['l_id'])) {
+					$tama = $yhteys->prepare("SELECT nimi FROM luokka WHERE luokkaid=?");
+					$tama->execute(array($_SESSION['l_id']));
+					$tamanimi = $tama->fetchObject()->nimi;
+	
+					if($onko_olemassa == TRUE && $nimi != $tamanimi) {
+						$virheteksti = 2;
+					}
 					
-					$yhteys->beginTransaction();
-					if ($ylaluokka == 0) {
-						$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
-						$lisaaluokka->execute(array($nimi));
-					}
 					else {
-						$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi, ylaluokka) VALUES (?, ?)");
-						$lisaaluokka->execute(array($nimi, $ylaluokka));
+						$muutayl = $yhteys->prepare("UPDATE luokka SET nimi=?, ylaluokka=? WHERE luokkaid=?");
+						$muutayl->execute(array($nimi, $ylaluokka, $_SESSION['l_id']));
+						header('Location: luokat.php');
 					}
-					$yhteys->commit();
-					unset($_SESSION['l_id']);
-					header('Location: luokat.php');
+					 
 				}
 				else {
-					$virheteksti = 1;
+				
+					if ($onko_olemassa == FALSE) {
+						
+						$yhteys->beginTransaction();
+						if ($ylaluokka == 0) {
+							$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi) VALUES (?)");
+							$lisaaluokka->execute(array($nimi));
+						}
+						else {
+							$lisaaluokka = $yhteys->prepare("INSERT INTO luokka (nimi, ylaluokka) VALUES (?, ?)");
+							$lisaaluokka->execute(array($nimi, $ylaluokka));
+						}
+						$yhteys->commit();
+						unset($_SESSION['l_id']);
+						header('Location: luokat.php');
+					}
+					else {
+						$virheteksti = 2;
+					}
 				}
 			}
 		}
@@ -93,6 +98,9 @@ else {
 	<h2>Luokka</h2>	
 	<?php
 		if ($virheteksti == 1) {
+			echo "Anna luokalle nimi.";
+		}
+		if ($virheteksti == 2) {
 			echo "Luokka $nimi löytyy jo.";
 		}
 	?>

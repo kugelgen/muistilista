@@ -15,41 +15,46 @@ else {
 		if (isset($_POST['submit'])) {
 
 			$nimi = filter_input(INPUT_POST, "nimi", FILTER_SANITIZE_SPECIAL_CHARS);
-			$luokka = $_POST["luokat"];
-			if ($luokka == 0) $luokka = NULL;
-			$tarkeys = $_POST["tarkeys"];
-			if ($tarkeys == 0) $tarkeys = NULL;
-			$pvm = date(DATE_ATOM, $_SERVER['REQUEST_TIME']);
-			
-			$tarkista = $yhteys->prepare("SELECT nimi FROM askare WHERE nimi=?");
-			$tarkista->execute(array($nimi));
-			$onko_olemassa = $tarkista->fetchObject();
-			
-			if (isset($_SESSION['a_id'])) {                          //muokataan
-				$tama = $yhteys->prepare("SELECT nimi FROM askare WHERE askareid=?");
-				$tama->execute(array($_SESSION['a_id']));
-				$tamanimi = $tama->fetchObject()->nimi;
-
-				if($onko_olemassa == TRUE && $nimi != $tamanimi) {
-					$virheteksti = 1;
-				}
-				else {
-					$muuta = $yhteys->prepare("UPDATE askare SET nimi=?, tarkeysaste=?, luokka=? WHERE askareid=?");
-					$muuta->execute(array($nimi, $tarkeys, $luokka, $_SESSION['a_id']));
-					header('Location: etusivu.php');
-				}
-				
+			if ($nimi == "") {
+				$virheteksti = 1;
 			}
-			else {                                                   //lisätään uusi
-				if ($onko_olemassa == FALSE) {
-					$yhteys->beginTransaction();
-					$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tarkeysaste) VALUES (?, ?, ?, ?)");
-					$lisaa_askare->execute(array($nimi, $pvm, $luokka, $tarkeys));
-					$yhteys->commit();
-					header('Location: etusivu.php');
-				}
 				else {
-					$virheteksti = 1;
+				$luokka = $_POST["luokat"];
+				if ($luokka == 0) $luokka = NULL;
+				$tarkeys = $_POST["tarkeys"];
+				if ($tarkeys == 0) $tarkeys = NULL;
+				$pvm = date(DATE_ATOM, $_SERVER['REQUEST_TIME']);
+				
+				$tarkista = $yhteys->prepare("SELECT nimi FROM askare WHERE nimi=?");
+				$tarkista->execute(array($nimi));
+				$onko_olemassa = $tarkista->fetchObject();
+				
+				if (isset($_SESSION['a_id'])) {                          //muokataan
+					$tama = $yhteys->prepare("SELECT nimi FROM askare WHERE askareid=?");
+					$tama->execute(array($_SESSION['a_id']));
+					$tamanimi = $tama->fetchObject()->nimi;
+	
+					if($onko_olemassa == TRUE && $nimi != $tamanimi) {
+						$virheteksti = 2;
+					}
+					else {
+						$muuta = $yhteys->prepare("UPDATE askare SET nimi=?, tarkeysaste=?, luokka=? WHERE askareid=?");
+						$muuta->execute(array($nimi, $tarkeys, $luokka, $_SESSION['a_id']));
+						header('Location: etusivu.php');
+					}
+					
+				}
+				else {                                                   //lisätään uusi
+					if ($onko_olemassa == FALSE) {
+						$yhteys->beginTransaction();
+						$lisaa_askare = $yhteys->prepare("INSERT INTO askare (nimi, kirjaushetki, luokka, tarkeysaste) VALUES (?, ?, ?, ?)");
+						$lisaa_askare->execute(array($nimi, $pvm, $luokka, $tarkeys));
+						$yhteys->commit();
+						header('Location: etusivu.php');
+					}
+					else {
+						$virheteksti = 2;
+					}
 				}
 			}
 		}
@@ -83,6 +88,9 @@ else {
 	<h2>Askare</h2>	
 	<?php
 		if ($virheteksti == 1) {
+			echo "Anna askareelle nimi.";
+		}
+		if ($virheteksti == 2) {
 			echo "Askare $nimi löytyy jo.";
 		}
 	?>
@@ -134,14 +142,7 @@ else {
 		</select>
 		</td>
 		</tr>
-		
-<!--		<tr>
-		<td class="noborder">DL</td>
-		<td class="noborder"><form>
-		<input type="text" name="dl" value="" size="15" maxlength="10" />
-		</td>
-		</tr>
--->		
+				
 		<tr>
 		<td class="noborder">Tärkeys</td>
 		<td class="noborder">
